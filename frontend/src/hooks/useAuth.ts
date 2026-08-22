@@ -31,9 +31,8 @@ export function useAuth() {
 
   const register = async (payload: RegisterPayload) => {
     const response = await registerService(payload);
-    setCurrentUser(response.user, response.token);
-    setUser(response.user);
-    router.push(getDashboardPath(response.user.role));
+    // Do NOT auto-login — redirect to login page
+    router.push("/login");
     return response;
   };
 

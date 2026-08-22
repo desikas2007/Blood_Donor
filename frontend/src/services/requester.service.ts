@@ -1,4 +1,3 @@
-import { api } from "@/lib/api";
 import { RequesterProfile } from "@/types/requester";
 
 export async function getRequesterProfile(

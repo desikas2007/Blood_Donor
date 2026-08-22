@@ -31,6 +31,25 @@ export function getStatusColor(status: string): string {
   }
 }
 
+export function getGreeting(): string {
+  const hour = new Date().getHours();
+  if (hour < 12) return "Good morning";
+  if (hour < 17) return "Good afternoon";
+  return "Good evening";
+}
+
+export function getUrgencyColor(urgency: string): string {
+  switch (urgency) {
+    case "critical":
+      return "bg-red-100 text-red-700";
+    case "urgent":
+      return "bg-orange-100 text-orange-700";
+    case "normal":
+    default:
+      return "bg-gray-100 text-gray-700";
+  }
+}
+
 export const BLOOD_GROUPS = [
   "A+",
   "A-",
@@ -48,4 +67,17 @@ export const STATES = [
   "Karnataka",
   "Andhra Pradesh",
   "Telangana",
+] as const;
+
+export const CITIES = [
+  "Chennai",
+  "Coimbatore",
+  "Erode",
+  "Salem",
+  "Tiruchengode",
+  "Madurai",
+  "Trichy",
+  "Bangalore",
+  "Hyderabad",
+  "Kochi",
 ] as const;

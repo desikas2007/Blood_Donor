@@ -2,9 +2,15 @@ export type UserRole = "public" | "donor" | "hospital" | "organization";
 
 export interface User {
   id: string;
+  name: string;
   email: string;
   role: UserRole;
   created_at: string;
+}
+
+/** Registered user stored in localStorage (includes password for mock auth) */
+export interface StoredUser extends User {
+  password: string;
 }
 
 export interface LoginPayload {

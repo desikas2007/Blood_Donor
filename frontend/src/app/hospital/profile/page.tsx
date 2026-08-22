@@ -1,39 +1,99 @@
 "use client";
 
+import { useState } from "react";
 import { useRole } from "@/hooks/useRole";
 import Loading from "@/components/common/Loading";
 
 export default function HospitalProfilePage() {
   const { user, loading } = useRole("hospital");
+  const [editing, setEditing] = useState(false);
+  const [form, setForm] = useState({
+    name: "KSR Hospital",
+    email: "ksrhospital@example.com",
+    phone: "+91-9876543220",
+    city: "Tiruchengode",
+    state: "Tamil Nadu",
+    address: "123 Main Road, Tiruchengode",
+    regNumber: "HRN-12345",
+  });
 
   if (loading) return <Loading />;
 
   return (
-    <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Hospital Profile</h1>
-      <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-        <h2 className="text-xl font-semibold mb-4">City Hospital</h2>
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          <div>
-            <span className="text-gray-500">Email</span>
-            <p className="font-medium">cityhospital@example.com</p>
+    <div>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-page-title text-dark">Hospital Profile</h1>
+          <p className="text-[15px] text-muted mt-1">Manage your hospital information.</p>
+        </div>
+        {!editing && (
+          <button onClick={() => setEditing(true)} className="h-9 px-4 border border-border rounded-md text-[13px] font-medium text-dark hover:bg-surface transition-colors">
+            Edit Profile
+          </button>
+        )}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-white border border-border rounded-lg p-6">
+          <div className="flex items-center gap-4 mb-5">
+            <div className="w-14 h-14 bg-red-600 text-white rounded-full flex items-center justify-center text-[18px] font-semibold">
+              {form.name.charAt(0)}
+            </div>
+            <div>
+              <h2 className="text-[17px] font-semibold text-dark">{form.name}</h2>
+              <p className="text-[13px] text-muted">Hospital</p>
+            </div>
           </div>
-          <div>
-            <span className="text-gray-500">Phone</span>
-            <p className="font-medium">+91-9876543220</p>
+          <div className="space-y-3">
+            {[
+              { label: "Email", value: form.email },
+              { label: "Phone", value: form.phone },
+              { label: "Reg. Number", value: form.regNumber },
+            ].map((item, i) => (
+              <div key={i} className="flex items-center justify-between py-2 border-b border-border last:border-0">
+                <span className="text-[13px] text-muted">{item.label}</span>
+                <span className="text-[14px] font-medium text-dark">{item.value}</span>
+              </div>
+            ))}
           </div>
-          <div>
-            <span className="text-gray-500">City</span>
-            <p className="font-medium">Tiruchengode</p>
-          </div>
-          <div>
-            <span className="text-gray-500">State</span>
-            <p className="font-medium">Tamil Nadu</p>
-          </div>
-          <div className="col-span-2">
-            <span className="text-gray-500">Address</span>
-            <p className="font-medium">123 Main Road, Tiruchengode</p>
-          </div>
+        </div>
+
+        <div className="bg-white border border-border rounded-lg p-6">
+          <h3 className="text-card-title text-dark mb-4">Location</h3>
+          {editing ? (
+            <div className="space-y-3">
+              {[
+                { key: "name", label: "Hospital Name" },
+                { key: "email", label: "Email" },
+                { key: "phone", label: "Phone" },
+                { key: "regNumber", label: "Registration Number" },
+                { key: "city", label: "City" },
+                { key: "address", label: "Address" },
+              ].map((field) => (
+                <div key={field.key}>
+                  <label className="block text-[12px] font-medium text-muted mb-1">{field.label}</label>
+                  <input value={(form as Record<string, string>)[field.key]} onChange={(e) => setForm({ ...form, [field.key]: e.target.value })} className="w-full h-9 px-3 border border-border rounded-md text-[14px] text-dark focus:outline-none focus:border-red-500" />
+                </div>
+              ))}
+              <div className="flex gap-2 pt-2">
+                <button onClick={() => setEditing(false)} className="h-9 px-4 bg-red-600 text-white rounded-md text-[13px] font-medium hover:bg-red-700 transition-colors">Save</button>
+                <button onClick={() => setEditing(false)} className="h-9 px-4 border border-border rounded-md text-[13px] font-medium text-muted hover:bg-surface transition-colors">Cancel</button>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {[
+                { label: "City", value: form.city },
+                { label: "State", value: form.state },
+                { label: "Address", value: form.address },
+              ].map((item, i) => (
+                <div key={i} className="flex items-center justify-between py-2 border-b border-border last:border-0">
+                  <span className="text-[13px] text-muted">{item.label}</span>
+                  <span className="text-[14px] font-medium text-dark">{item.value}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -1,26 +1,32 @@
 "use client";
 
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { UserRole } from "@/types/auth";
+import { User, UserRole } from "@/types/auth";
 import { getCurrentUser, getDashboardPath } from "@/lib/auth";
 
 export function useRole(requiredRole?: UserRole) {
   const router = useRouter();
-  const user = getCurrentUser();
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    if (!user) {
+    const currentUser = getCurrentUser();
+    if (!currentUser) {
       router.push("/login");
       return;
     }
-    if (requiredRole && user.role !== requiredRole) {
-      router.push(getDashboardPath(user.role));
+    if (requiredRole && currentUser.role !== requiredRole) {
+      router.push(getDashboardPath(currentUser.role));
+      return;
     }
-  }, [user, requiredRole, router]);
+    setUser(currentUser);
+    setLoading(false);
+  }, [requiredRole, router]);
 
   return {
     user,
+    loading,
     isAuthenticated: !!user,
     role: user?.role ?? null,
   };

@@ -19,6 +19,7 @@ export function setCurrentUser(user: User, token: string) {
 export function clearCurrentUser() {
   localStorage.removeItem("user");
   localStorage.removeItem("token");
+  localStorage.removeItem("blood_portal_session");
 }
 
 export function isAuthenticated(): boolean {

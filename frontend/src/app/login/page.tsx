@@ -1,26 +1,28 @@
-import Link from "next/link";
+"use client";
+
+import { Suspense } from "react";
+import PublicLayout from "@/components/layout/PublicLayout";
 import LoginForm from "@/components/auth/LoginForm";
 
 export default function LoginPage() {
   return (
-    <div className="min-h-[80vh] flex items-center justify-center px-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">Welcome Back</h1>
-          <p className="text-gray-600 mt-1">Sign in to your account</p>
+    <PublicLayout>
+      <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
+        <div className="w-full max-w-[400px]">
+          <div className="text-center mb-8">
+            <div className="w-14 h-14 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-2xl">🩸</span>
+            </div>
+            <h1 className="text-page-title text-dark">Welcome Back</h1>
+            <p className="text-[14px] text-muted mt-1">Sign in to your account</p>
+          </div>
+          <div className="bg-white border border-border rounded-lg p-6">
+            <Suspense>
+              <LoginForm />
+            </Suspense>
+          </div>
         </div>
-
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-          <LoginForm />
-        </div>
-
-        <p className="text-center mt-4 text-sm text-gray-600">
-          Don&apos;t have an account?{" "}
-          <Link href="/register" className="text-primary-600 hover:underline">
-            Register here
-          </Link>
-        </p>
       </div>
-    </div>
+    </PublicLayout>
   );
 }
