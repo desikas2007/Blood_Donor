@@ -141,7 +141,7 @@ Select Role
      │
  ┌───┼──────────┬───────────┐
  ▼   ▼          ▼           ▼
-Public Donor   Hospital   Organization
+Public Donor   Hospital    Organization
 ```
 
 The frontend currently uses **mock authentication** and is structured for future backend authentication integration.
