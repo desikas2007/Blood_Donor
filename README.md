@@ -555,25 +555,7 @@ Changes should be merged through Pull Requests.
 
 ---
 
-# 👨‍💻 Team Members
 
-## Team Members
-
-### 1. Desika S
-
-**3rd Year — Computer Science and Engineering**
-
-### 2. Arul P
-
-**3rd Year — Computer Science and Engineering**
-
-### 3. Dharani S
-
-**3rd Year — Computer Science and Engineering**
-
-> The project currently has three listed team members. The four functional areas are Public User, Donor, Hospital, and Organization; module ownership can be assigned among the team members as development proceeds.
-
----
 
 # 📋 Development Responsibilities
 
