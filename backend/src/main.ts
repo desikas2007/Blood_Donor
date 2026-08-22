@@ -7,6 +7,14 @@ async function bootstrap() {
 
   app.setGlobalPrefix("api");
 
+  // Support requests WITHOUT /api prefix (frontend stale build sends bare paths)
+  app.use((req: any, _res: any, next: any) => {
+    if (req.method !== "OPTIONS" && !req.url.startsWith("/api")) {
+      req.url = "/api" + req.url;
+    }
+    next();
+  });
+
   app.enableCors({
     origin: process.env.CORS_ORIGIN || "http://localhost:3000",
     credentials: true,

@@ -6,10 +6,13 @@ import {
   Param,
   Body,
   Query,
+  UseGuards,
 } from "@nestjs/common";
 import { DonorsService } from "./donors.service";
 import { CreateDonorDto } from "./dto/create-donor.dto";
 import { UpdateDonorDto } from "./dto/update-donor.dto";
+import { JwtAuthGuard } from "../auth/jwt-auth.guard";
+import { CurrentUser } from "../auth/current-user.decorator";
 
 @Controller("donors")
 export class DonorsController {
@@ -29,9 +32,9 @@ export class DonorsController {
   }
 
   @Get("me")
-  getProfile() {
-    // TODO: Extract user from JWT token
-    return this.donorsService.findOne("me");
+  @UseGuards(JwtAuthGuard)
+  async getProfile(@CurrentUser() user: any) {
+    return this.donorsService.findOneByUserId(user.sub);
   }
 
   @Get(":id")

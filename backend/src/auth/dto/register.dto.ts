@@ -8,9 +8,9 @@ import {
 } from "class-validator";
 
 export class RegisterDto {
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
-  name: string;
+  name?: string;
 
   @IsEmail()
   email: string;

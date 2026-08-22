@@ -5,10 +5,13 @@ import {
   Patch,
   Param,
   Body,
+  UseGuards,
 } from "@nestjs/common";
 import { RequestsService } from "./requests.service";
 import { CreateRequestDto } from "./dto/create-request.dto";
 import { UpdateStatusDto } from "./dto/update-status.dto";
+import { JwtAuthGuard } from "../auth/jwt-auth.guard";
+import { CurrentUser } from "../auth/current-user.decorator";
 
 @Controller("requests")
 export class RequestsController {
@@ -20,15 +23,19 @@ export class RequestsController {
   }
 
   @Get("sent")
-  getSent() {
-    // TODO: Extract requester_id from JWT token
-    return this.requestsService.findByRequester("me");
+  @UseGuards(JwtAuthGuard)
+  async getSent(@CurrentUser() user: any) {
+    const requesterId = await this.requestsService.findRequesterIdByUserId(
+      user.sub
+    );
+    return this.requestsService.findByRequester(requesterId);
   }
 
   @Get("received")
-  getReceived() {
-    // TODO: Extract donor_id from JWT token
-    return this.requestsService.findByDonor("me");
+  @UseGuards(JwtAuthGuard)
+  async getReceived(@CurrentUser() user: any) {
+    const donorId = await this.requestsService.findDonorIdByUserId(user.sub);
+    return this.requestsService.findByDonor(donorId);
   }
 
   @Patch(":id/status")

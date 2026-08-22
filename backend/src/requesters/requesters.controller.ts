@@ -5,10 +5,13 @@ import {
   Patch,
   Param,
   Body,
+  UseGuards,
 } from "@nestjs/common";
 import { RequestersService } from "./requesters.service";
 import { CreateRequesterDto } from "./dto/create-requester.dto";
 import { UpdateRequesterDto } from "./dto/update-requester.dto";
+import { JwtAuthGuard } from "../auth/jwt-auth.guard";
+import { CurrentUser } from "../auth/current-user.decorator";
 
 @Controller("requesters")
 export class RequestersController {
@@ -17,6 +20,12 @@ export class RequestersController {
   @Post()
   create(@Body() createRequesterDto: CreateRequesterDto) {
     return this.requestersService.create(createRequesterDto);
+  }
+
+  @Get("me")
+  @UseGuards(JwtAuthGuard)
+  findMe(@CurrentUser() user: any) {
+    return this.requestersService.findOneByUserId(user.sub);
   }
 
   @Get(":id")

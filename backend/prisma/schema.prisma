@@ -1,0 +1,73 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  role      String
+  name      String?
+  phone     String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("users")
+}
+
+model Donor {
+  id               String   @id @default(cuid())
+  userId           String?  @unique @map("user_id")
+  fullName         String   @map("full_name")
+  phone            String
+  email            String
+  bloodGroup       String   @map("blood_group")
+  city             String
+  state            String
+  available        Boolean  @default(true)
+  lastDonationDate String?  @map("last_donation_date")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  @@map("donors")
+}
+
+model Requester {
+  id               String   @id @default(cuid())
+  userId           String?  @unique @map("user_id")
+  type             String
+  name             String
+  phone            String
+  email            String
+  city             String
+  state            String
+  address          String
+  organizationType String?  @map("organization_type")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  @@map("requesters")
+}
+
+model BloodRequest {
+  id              String   @id @default(cuid())
+  donorId         String   @map("donor_id")
+  donorName       String   @map("donor_name")
+  donorBloodGroup String   @map("donor_blood_group")
+  donorCity       String   @map("donor_city")
+  requesterId     String   @map("requester_id")
+  requesterName   String   @map("requester_name")
+  requesterType   String   @map("requester_type")
+  bloodGroup      String   @map("blood_group")
+  message         String   @default("")
+  status          String   @default("pending")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@map("blood_requests")
+}
