@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
+import Navbar from "@/components/common/Navbar";
+import Footer from "@/components/common/Footer";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Codebuff App",
-  description: "Next.js frontend with Nest.js backend",
+  title: "Blood Donor Portal",
+  description: "Connect with blood donors in your area",
 };
 
 export default function RootLayout({
@@ -13,7 +15,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className="flex flex-col min-h-screen">
+        <Navbar />
+        <main className="flex-1">{children}</main>
+        <Footer />
+      </body>
     </html>
   );
 }
