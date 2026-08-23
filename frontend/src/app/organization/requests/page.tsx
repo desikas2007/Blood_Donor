@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRole } from "@/hooks/useRole";
 import { BloodRequest } from "@/types/request";
-import { getSentRequests } from "@/services/request.service";
+import { getSentRequests, updateRequestStatus } from "@/services/request.service";
 import Loading from "@/components/common/Loading";
 
 export default function OrganizationRequestsPage() {
@@ -22,6 +22,13 @@ export default function OrganizationRequestsPage() {
   }, [user]);
 
   const filtered = filter === "all" ? requests : requests.filter((r) => r.status === filter);
+
+  const handleComplete = async (id: string) => {
+    try {
+      const updated = await updateRequestStatus(id, "completed");
+      setRequests((prev) => prev.map((r) => (r.id === id ? updated : r)));
+    } catch {}
+  };
 
   if (authLoading || loading) return <Loading />;
 
@@ -60,6 +67,14 @@ export default function OrganizationRequestsPage() {
                 </span>
               </div>
               <p className="text-[13px] text-muted mt-2">{req.donor_blood_group} &middot; {req.message}</p>
+              {req.status === "accepted" && (
+                <button
+                  onClick={() => handleComplete(req.id)}
+                  className="mt-3 h-9 px-4 bg-red-600 text-white rounded-md text-[13px] font-medium hover:bg-red-700 transition-colors"
+                >
+                  Mark as Completed
+                </button>
+              )}
             </div>
           ))}
         </div>

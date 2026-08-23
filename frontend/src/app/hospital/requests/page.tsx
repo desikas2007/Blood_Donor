@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRole } from "@/hooks/useRole";
 import { BloodRequest } from "@/types/request";
-import { getSentRequests } from "@/services/request.service";
+import { getSentRequests, updateRequestStatus } from "@/services/request.service";
 import Loading from "@/components/common/Loading";
 
 export default function HospitalRequestsPage() {
@@ -22,6 +22,13 @@ export default function HospitalRequestsPage() {
   }, [user]);
 
   const filtered = filter === "all" ? requests : requests.filter((r) => r.status === filter);
+
+  const handleComplete = async (id: string) => {
+    try {
+      const updated = await updateRequestStatus(id, "completed");
+      setRequests((prev) => prev.map((r) => (r.id === id ? updated : r)));
+    } catch {}
+  };
 
   if (authLoading || loading) return <Loading />;
 
@@ -65,6 +72,7 @@ export default function HospitalRequestsPage() {
                   <th className="text-left px-5 py-3 text-[12px] font-medium text-muted uppercase">Blood Group</th>
                   <th className="text-left px-5 py-3 text-[12px] font-medium text-muted uppercase">Date</th>
                   <th className="text-left px-5 py-3 text-[12px] font-medium text-muted uppercase">Status</th>
+                  <th className="text-left px-5 py-3 text-[12px] font-medium text-muted uppercase">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -82,6 +90,16 @@ export default function HospitalRequestsPage() {
                       }`}>
                         {req.status.charAt(0).toUpperCase() + req.status.slice(1)}
                       </span>
+                    </td>
+                    <td className="px-5 py-4">
+                      {req.status === "accepted" && (
+                        <button
+                          onClick={() => handleComplete(req.id)}
+                          className="h-8 px-3 bg-red-600 text-white rounded-md text-[13px] font-medium hover:bg-red-700 transition-colors"
+                        >
+                          Mark as Completed
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -105,6 +123,14 @@ export default function HospitalRequestsPage() {
                 </div>
                 <p className="text-[13px] text-muted">{req.donor_blood_group} &middot; {req.donor_city}</p>
                 <p className="text-[12px] text-muted mt-1">{new Date(req.created_at).toLocaleDateString("en-IN")}</p>
+                {req.status === "accepted" && (
+                  <button
+                    onClick={() => handleComplete(req.id)}
+                    className="mt-3 h-9 px-4 bg-red-600 text-white rounded-md text-[13px] font-medium hover:bg-red-700 transition-colors"
+                  >
+                    Mark as Completed
+                  </button>
+                )}
               </div>
             ))}
           </div>
