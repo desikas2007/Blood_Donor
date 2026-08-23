@@ -93,6 +93,8 @@ export class AuthService {
     id: string;
     email: string;
     role: string;
+    name?: string | null;
+    phone?: string | null;
     createdAt: Date;
   }) {
     const token = this.jwt.sign({
@@ -106,6 +108,8 @@ export class AuthService {
         id: user.id,
         email: user.email,
         role: user.role,
+        name: user.name ?? "",
+        phone: user.phone ?? "",
         created_at: user.createdAt.toISOString(),
       },
       token,
