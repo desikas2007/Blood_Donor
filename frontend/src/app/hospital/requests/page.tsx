@@ -14,7 +14,7 @@ export default function HospitalRequestsPage() {
 
   useEffect(() => {
     if (user) {
-      getSentRequests("u10")
+      getSentRequests()
         .then((data) => setRequests(data))
         .catch(() => {})
         .finally(() => setLoading(false));

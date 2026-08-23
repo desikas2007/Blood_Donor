@@ -28,7 +28,7 @@ export default function OrganizationDashboardPage() {
 
   useEffect(() => {
     if (user) {
-      Promise.all([searchDonors({}), getSentRequests("u11")])
+      Promise.all([searchDonors({}), getSentRequests()])
         .then(([d, r]) => {
           setDonors(d);
           setRequests(r);
@@ -55,8 +55,8 @@ export default function OrganizationDashboardPage() {
   const handleSendRequest = async () => {
     if (!selectedDonor || !message.trim()) return;
     try {
-      await sendRequest(selectedDonor.id, selectedDonor.blood_group, message, urgency, units);
-      const updated = await getSentRequests("u11");
+      await sendRequest(selectedDonor, selectedDonor.blood_group, message, urgency, units);
+      const updated = await getSentRequests();
       setRequests(updated);
       setModalOpen(false);
       setMessage("");

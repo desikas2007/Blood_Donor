@@ -14,7 +14,7 @@ export default function DonorRequestsPage() {
 
   useEffect(() => {
     if (user) {
-      getReceivedRequests("d1")
+      getReceivedRequests()
         .then((data) => setRequests(data))
         .catch(() => {})
         .finally(() => setLoading(false));
@@ -22,13 +22,17 @@ export default function DonorRequestsPage() {
   }, [user]);
 
   const handleAccept = async (id: string) => {
-    const updated = await updateRequestStatus(id, "accepted");
-    setRequests((prev) => prev.map((r) => (r.id === id ? updated : r)));
+    try {
+      const updated = await updateRequestStatus(id, "accepted");
+      setRequests((prev) => prev.map((r) => (r.id === id ? updated : r)));
+    } catch {}
   };
 
   const handleReject = async (id: string) => {
-    const updated = await updateRequestStatus(id, "rejected");
-    setRequests((prev) => prev.map((r) => (r.id === id ? updated : r)));
+    try {
+      const updated = await updateRequestStatus(id, "rejected");
+      setRequests((prev) => prev.map((r) => (r.id === id ? updated : r)));
+    } catch {}
   };
 
   const filtered = filter === "all" ? requests : requests.filter((r) => r.status === filter);
@@ -44,7 +48,7 @@ export default function DonorRequestsPage() {
 
       {/* Filters */}
       <div className="flex gap-2 mb-6">
-        {["all", "pending", "accepted", "rejected"].map((tab) => (
+        {["all", "pending", "accepted", "rejected", "completed"].map((tab) => (
           <button
             key={tab}
             onClick={() => setFilter(tab)}

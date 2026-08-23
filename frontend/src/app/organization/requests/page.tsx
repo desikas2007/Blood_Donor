@@ -14,7 +14,7 @@ export default function OrganizationRequestsPage() {
 
   useEffect(() => {
     if (user) {
-      getSentRequests("u11")
+      getSentRequests()
         .then((data) => setRequests(data))
         .catch(() => {})
         .finally(() => setLoading(false));

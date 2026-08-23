@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRole } from "@/hooks/useRole";
 import { DonorProfile } from "@/types/donor";
-import { getDonorProfile, updateDonorProfile } from "@/services/donor.service";
+import { getMyDonorProfile, updateDonorProfile } from "@/services/donor.service";
 import Loading from "@/components/common/Loading";
 
 export default function AvailabilityPage() {
@@ -13,7 +13,7 @@ export default function AvailabilityPage() {
 
   useEffect(() => {
     if (user) {
-      getDonorProfile("d1")
+      getMyDonorProfile()
         .then((d) => setDonor(d))
         .catch(() => {})
         .finally(() => setLoading(false));

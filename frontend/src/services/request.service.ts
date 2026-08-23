@@ -1,62 +1,61 @@
-import { BloodRequest, RequestStatus, UrgencyLevel } from "@/types/request";
-import { dummyRequests } from "@/data/requests";
+import { api } from "@/lib/api";
+import { BloodRequest, RequestStatus } from "@/types/request";
+import { getMyRequesterProfile } from "@/services/requester.service";
 
-let requests = [...dummyRequests];
-
-export async function getReceivedRequests(
-  donorId: string
-): Promise<BloodRequest[]> {
-  return requests.filter((r) => r.donor_id === donorId);
+/** Requests received by the logged-in donor */
+export async function getReceivedRequests(): Promise<BloodRequest[]> {
+  const { data } = await api.get<BloodRequest[]>("/requests/received");
+  return data ?? [];
 }
 
-export async function getSentRequests(
-  requesterId: string
-): Promise<BloodRequest[]> {
-  return requests.filter((r) => r.requester_id === requesterId);
+/** Requests sent by the logged-in hospital/organization */
+export async function getSentRequests(): Promise<BloodRequest[]> {
+  const { data } = await api.get<BloodRequest[]>("/requests/sent");
+  return data ?? [];
+}
+
+export interface SendRequestDonor {
+  id: string;
+  full_name: string;
+  blood_group: string;
+  city: string;
 }
 
 export async function sendRequest(
-  donorId: string,
+  donor: SendRequestDonor,
   bloodGroup: string,
   message: string,
-  urgency: UrgencyLevel = "normal",
+  urgency: string = "normal",
   requiredUnits: number = 1
 ): Promise<BloodRequest> {
-  const donor = (await import("@/data/donors")).dummyDonors.find(
-    (d) => d.id === donorId
-  );
-  const newRequest: BloodRequest = {
-    id: "r" + Date.now(),
-    donor_id: donorId,
-    donor_name: donor?.full_name || "Unknown Donor",
-    donor_blood_group: donor?.blood_group || bloodGroup,
-    donor_city: donor?.city || "Unknown",
-    requester_id: "req1",
-    requester_name: "Requester",
-    requester_type: "hospital",
-    blood_group: bloodGroup,
-    required_units: requiredUnits,
-    urgency,
-    message,
-    status: "pending",
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  };
-  requests = [...requests, newRequest];
-  return newRequest;
+  const requester = await getMyRequesterProfile();
+
+  // urgency/units are not backend fields — carry them inside the message
+  const prefix =
+    urgency !== "normal"
+      ? `[${urgency.toUpperCase()} - ${requiredUnits} unit${requiredUnits > 1 ? "s" : ""}] `
+      : "";
+
+  const { data } = await api.post<BloodRequest>("/requests", {
+    donor_id: donor.id,
+    donor_name: donor.full_name,
+    donor_blood_group: donor.blood_group,
+    donor_city: donor.city,
+    requester_id: requester.id,
+    requester_name: requester.name,
+    requester_type: requester.type,
+    blood_group: bloodGroup || donor.blood_group,
+    message: `${prefix}${message}`.trim(),
+  });
+  return data;
 }
 
 export async function updateRequestStatus(
   requestId: string,
   status: RequestStatus
 ): Promise<BloodRequest> {
-  const request = requests.find((r) => r.id === requestId);
-  if (!request) throw new Error("Request not found");
-  const updated = {
-    ...request,
+  const { data } = await api.patch<BloodRequest>(`/requests/${requestId}/status`, {
     status,
-    updated_at: new Date().toISOString(),
-  };
-  requests = requests.map((r) => (r.id === requestId ? updated : r));
-  return updated;
+  });
+  return data;
 }

@@ -30,7 +30,7 @@ export default function HospitalDashboardPage() {
 
   useEffect(() => {
     if (user) {
-      Promise.all([searchDonors({}), getSentRequests("u10")])
+      Promise.all([searchDonors({}), getSentRequests()])
         .then(([d, r]) => {
           setDonors(d);
           setRequests(r);
@@ -57,8 +57,8 @@ export default function HospitalDashboardPage() {
   const handleSendRequest = async () => {
     if (!selectedDonor || !message.trim()) return;
     try {
-      await sendRequest(selectedDonor.id, selectedDonor.blood_group, message, urgency, units);
-      const updated = await getSentRequests("u10");
+      await sendRequest(selectedDonor, selectedDonor.blood_group, message, urgency, units);
+      const updated = await getSentRequests();
       setRequests(updated);
       setModalOpen(false);
       setMessage("");

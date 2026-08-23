@@ -10,5 +10,7 @@ export interface RequesterProfile {
   city: string;
   state: string;
   address: string;
+  organization_type?: string | null;
   created_at: string;
+  updated_at?: string;
 }

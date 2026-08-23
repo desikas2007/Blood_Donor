@@ -1,21 +1,46 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRole } from "@/hooks/useRole";
+import { getCurrentUser } from "@/lib/auth";
 import Loading from "@/components/common/Loading";
 
+const STORAGE_KEY = "public_profile";
+
 export default function PublicProfilePage() {
-  const { user, loading } = useRole("public");
+  const { user, loading: authLoading } = useRole("public");
   const [editing, setEditing] = useState(false);
+  const [saved, setSaved] = useState(false);
   const [form, setForm] = useState({
-    name: "Public User",
-    email: "public@example.com",
-    phone: "+91-9876543230",
-    city: "Chennai",
-    state: "Tamil Nadu",
+    name: "", email: "", phone: "", city: "", state: "",
   });
 
-  if (loading) return <Loading />;
+  useEffect(() => {
+    if (!user) return;
+    // Public users have no backend profile entity — seed from account + keep local edits
+    const stored = typeof window !== "undefined" ? localStorage.getItem(STORAGE_KEY) : null;
+    if (stored) {
+      try {
+        setForm(JSON.parse(stored));
+        return;
+      } catch {}
+    }
+    setForm({
+      name: getCurrentUser()?.name || "",
+      email: getCurrentUser()?.email || "",
+      phone: (getCurrentUser() as any)?.phone || "",
+      city: "", state: "",
+    });
+  }, [user]);
+
+  const handleSave = () => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(form));
+    setSaved(true);
+    setEditing(false);
+    setTimeout(() => setSaved(false), 2000);
+  };
+
+  if (authLoading) return <Loading />;
 
   return (
     <div>
@@ -35,7 +60,7 @@ export default function PublicProfilePage() {
         <div className="bg-white border border-border rounded-lg p-6">
           <div className="flex items-center gap-4 mb-5">
             <div className="w-14 h-14 bg-red-600 text-white rounded-full flex items-center justify-center text-[18px] font-semibold">
-              {form.name.charAt(0)}
+              {(form.name || "P").charAt(0)}
             </div>
             <div>
               <h2 className="text-[17px] font-semibold text-dark">{form.name}</h2>
@@ -51,7 +76,7 @@ export default function PublicProfilePage() {
             ].map((item, i) => (
               <div key={i} className="flex items-center justify-between py-2 border-b border-border last:border-0">
                 <span className="text-[13px] text-muted">{item.label}</span>
-                <span className="text-[14px] font-medium text-dark">{item.value}</span>
+                <span className="text-[14px] font-medium text-dark">{item.value || "-"}</span>
               </div>
             ))}
           </div>
@@ -61,19 +86,20 @@ export default function PublicProfilePage() {
           <h3 className="text-card-title text-dark mb-4">Personal Information</h3>
           {editing ? (
             <div className="space-y-3">
-              {[
+              {([
                 { key: "name", label: "Full Name" },
                 { key: "email", label: "Email" },
                 { key: "phone", label: "Phone" },
                 { key: "city", label: "City" },
-              ].map((field) => (
+                { key: "state", label: "State" },
+              ] as const).map((field) => (
                 <div key={field.key}>
                   <label className="block text-[12px] font-medium text-muted mb-1">{field.label}</label>
-                  <input value={(form as Record<string, string>)[field.key]} onChange={(e) => setForm({ ...form, [field.key]: e.target.value })} className="w-full h-9 px-3 border border-border rounded-md text-[14px] text-dark focus:outline-none focus:border-red-500" />
+                  <input value={form[field.key]} onChange={(e) => setForm({ ...form, [field.key]: e.target.value })} className="w-full h-9 px-3 border border-border rounded-md text-[14px] text-dark focus:outline-none focus:border-red-500" />
                 </div>
               ))}
               <div className="flex gap-2 pt-2">
-                <button onClick={() => setEditing(false)} className="h-9 px-4 bg-red-600 text-white rounded-md text-[13px] font-medium hover:bg-red-700 transition-colors">Save</button>
+                <button onClick={handleSave} className="h-9 px-4 bg-red-600 text-white rounded-md text-[13px] font-medium hover:bg-red-700 transition-colors">Save</button>
                 <button onClick={() => setEditing(false)} className="h-9 px-4 border border-border rounded-md text-[13px] font-medium text-muted hover:bg-surface transition-colors">Cancel</button>
               </div>
             </div>
@@ -88,9 +114,10 @@ export default function PublicProfilePage() {
               ].map((item, i) => (
                 <div key={i} className="flex items-center justify-between py-2 border-b border-border last:border-0">
                   <span className="text-[13px] text-muted">{item.label}</span>
-                  <span className="text-[14px] font-medium text-dark">{item.value}</span>
+                  <span className="text-[14px] font-medium text-dark">{item.value || "-"}</span>
                 </div>
               ))}
+              {saved && <p className="text-[13px] text-green-600">Profile saved.</p>}
             </div>
           )}
         </div>

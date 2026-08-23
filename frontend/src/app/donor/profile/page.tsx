@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRole } from "@/hooks/useRole";
 import { DonorProfile } from "@/types/donor";
-import { getDonorProfile, updateDonorProfile } from "@/services/donor.service";
+import { getMyDonorProfile, updateDonorProfile } from "@/services/donor.service";
 import Loading from "@/components/common/Loading";
 import { BLOOD_GROUPS, STATES, formatDate } from "@/lib/utils";
 
@@ -17,7 +17,7 @@ export default function DonorProfilePage() {
 
   useEffect(() => {
     if (user) {
-      getDonorProfile("d1")
+      getMyDonorProfile()
         .then((d) => {
           setDonor(d);
           setForm({

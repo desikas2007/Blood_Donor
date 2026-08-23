@@ -5,7 +5,7 @@ import { useRole } from "@/hooks/useRole";
 import { BloodRequest } from "@/types/request";
 import { DonorProfile } from "@/types/donor";
 import { getReceivedRequests, updateRequestStatus } from "@/services/request.service";
-import { getDonorProfile } from "@/services/donor.service";
+import { getMyDonorProfile } from "@/services/donor.service";
 import Loading from "@/components/common/Loading";
 import { getGreeting } from "@/lib/utils";
 
@@ -14,35 +14,50 @@ export default function DonorDashboardPage() {
   const [donor, setDonor] = useState<DonorProfile | null>(null);
   const [requests, setRequests] = useState<BloodRequest[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (user) {
-      Promise.all([getDonorProfile("d1"), getReceivedRequests("d1")])
+      Promise.all([getMyDonorProfile(), getReceivedRequests()])
         .then(([d, r]) => {
           setDonor(d);
           setRequests(r);
         })
-        .catch(() => {})  
+        .catch((e) => setError(e?.response?.data?.message || "Failed to load your profile."))
         .finally(() => setLoading(false));
     }
   }, [user]);
 
   const handleAccept = async (id: string) => {
-    const updated = await updateRequestStatus(id, "accepted");
-    setRequests((prev) => prev.map((r) => (r.id === id ? updated : r)));
+    try {
+      const updated = await updateRequestStatus(id, "accepted");
+      setRequests((prev) => prev.map((r) => (r.id === id ? updated : r)));
+    } catch {}
   };
 
   const handleReject = async (id: string) => {
-    const updated = await updateRequestStatus(id, "rejected");
-    setRequests((prev) => prev.map((r) => (r.id === id ? updated : r)));
+    try {
+      const updated = await updateRequestStatus(id, "rejected");
+      setRequests((prev) => prev.map((r) => (r.id === id ? updated : r)));
+    } catch {}
   };
 
   if (authLoading || loading) return <Loading />;
-  if (!donor) return <Loading />;
+  if (!donor)
+    return (
+      <div className="bg-white border border-border rounded-lg p-8 text-center">
+        <p className="text-[15px] text-dark font-medium mb-1">Donor profile unavailable</p>
+        <p className="text-[13px] text-muted">{error || "Please re-login to sync your profile."}</p>
+      </div>
+    );
+
+  const donationsDone = requests.filter(
+    (r) => r.status === "completed" || r.status === "accepted"
+  ).length;
 
   const stats = [
     { label: "Blood Group", value: donor.blood_group },
-    { label: "Total Donations", value: "12" },
+    { label: "Total Donations", value: String(donationsDone) },
     { label: "Requests Received", value: String(requests.length) },
     { label: "Accepted", value: String(requests.filter((r) => r.status === "accepted").length) },
   ];
