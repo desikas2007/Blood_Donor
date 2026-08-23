@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
+import { Requester } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import { CreateRequesterDto } from "./dto/create-requester.dto";
 import { UpdateRequesterDto } from "./dto/update-requester.dto";
@@ -59,7 +60,7 @@ export class RequestersService {
     return this.serialize(requester);
   }
 
-  private serialize(requester: any) {
+  private serialize(requester: Requester) {
     return {
       id: requester.id,
       user_id: requester.userId,

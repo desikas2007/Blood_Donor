@@ -36,6 +36,7 @@ export class AuthService {
       },
     });
 
+    // Create profile based on role
     if (dto.role === "donor") {
       await this.prisma.donor.create({
         data: {

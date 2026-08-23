@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
+import { BloodRequest } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import { CreateRequestDto } from "./dto/create-request.dto";
 
@@ -68,7 +69,7 @@ export class RequestsService {
     return this.serialize(request);
   }
 
-  private serialize(request: any) {
+  private serialize(request: BloodRequest) {
     return {
       id: request.id,
       donor_id: request.donorId,

@@ -60,6 +60,7 @@ export class SupabaseService implements OnModuleInit, OnModuleDestroy {
   async onModuleInit() {
     const health = await this.healthCheck();
     if (health.database === "connected") {
+      this.connected = true;
       this.logger.log("Database connection verified (Supabase Postgres)");
     }
 

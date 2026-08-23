@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
+import { Donor } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import { CreateDonorDto } from "./dto/create-donor.dto";
 import { UpdateDonorDto } from "./dto/update-donor.dto";
@@ -24,19 +25,21 @@ export class DonorsService {
   }
 
   async findAll(filters?: { blood_group?: string; city?: string }) {
-    const donors = await this.prisma.donor.findMany({
-      where: filters?.blood_group
-        ? { bloodGroup: filters.blood_group }
-        : undefined,
-    });
+    const where: any = {};
 
-    const results = filters?.city
-      ? donors.filter((d) =>
-          d.city.toLowerCase().includes(filters.city!.toLowerCase())
-        )
-      : donors;
+    if (filters?.blood_group) {
+      where.bloodGroup = filters.blood_group;
+    }
 
-    return results.map((d) => this.serialize(d));
+    let donors = await this.prisma.donor.findMany({ where });
+
+    if (filters?.city) {
+      donors = donors.filter((d) =>
+        d.city.toLowerCase().includes(filters.city!.toLowerCase())
+      );
+    }
+
+    return donors.map((d) => this.serialize(d));
   }
 
   async findOne(id: string) {
@@ -73,7 +76,7 @@ export class DonorsService {
     return this.serialize(donor);
   }
 
-  private serialize(donor: any) {
+  private serialize(donor: Donor) {
     return {
       id: donor.id,
       user_id: donor.userId,

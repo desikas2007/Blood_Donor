@@ -20,7 +20,7 @@ export class PrismaService extends PrismaClient implements OnModuleDestroy {
     } catch (error) {
       this.connected = false;
       this.logger.error(
-        `Database NOT reachable - writes will fail until DATABASE_URL points to a live Supabase Postgres instance. Retrying in 10s... (${String(error)})`
+        `Database NOT reachable - writes will fail until DATABASE_URL points to a live Postgres instance. Retrying in 10s... (${String(error)})`
       );
       setTimeout(() => this.connectWithRetry(), 10_000);
     }
